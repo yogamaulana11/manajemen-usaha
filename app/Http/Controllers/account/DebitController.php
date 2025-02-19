@@ -116,6 +116,7 @@ class DebitController extends Controller
     {
         $categories = CategoriesDebit::where('user_id', Auth::user()->id)
             ->get();
+
         return  view('account.debit.edit', compact('debit', 'categories'));
     }
 

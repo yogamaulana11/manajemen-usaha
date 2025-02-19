@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title')
-    Dashboard - UANGKU
+    Dashboard - {{ config('app.name') }}
 @stop
 
 @section('content')

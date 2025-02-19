@@ -42,4 +42,8 @@ Route::prefix('account')->group(function () {
     Route::get('/laporan_credit', 'account\LaporanCreditController@index')->name('account.laporan_credit.index');
     Route::get('/laporan_credit/check', 'account\LaporanCreditController@check')->name('account.laporan_credit.check');
 
+    // stock barang
+    Route::get('/stock/search', 'account\StockBarangController@search')->name('account.stock_barang.search');
+    Route::Resource('/stock', 'account\StockBarangController',['as' => 'account']);
+
 });
