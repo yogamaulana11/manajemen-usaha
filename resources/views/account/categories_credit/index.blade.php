@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title')
-    Kategori Uang keluar - UANGKU
+    Kategori Uang keluar - {{ config('app.name') }}
 @stop
 
 @section('content')

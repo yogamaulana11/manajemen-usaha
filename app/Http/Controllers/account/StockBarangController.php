@@ -26,7 +26,7 @@ class StockBarangController extends Controller
     public function index()
     {
         $stok = DB::table('stock_barang')
-            ->select('stock_barang.id', 'stock_barang.kategori_barang', 'stock_barang.nama_barang', 'stock_barang.jumlah_stok', 'stock_barang.tanggal_update',)
+            ->select('stock_barang.id', 'stock_barang.kategori_barang', 'stock_barang.nama_barang', 'stock_barang.jumlah_stok', 'stock_barang.tanggal_update')
             ->orderBy('stock_barang.created_at', 'DESC')
             ->paginate(10);
 
@@ -170,5 +170,17 @@ class StockBarangController extends Controller
                 'status' => 'error'
             ]);
         }
+    }
+    public function search(Request $request)
+    {
+        $search = $request->get('q');
+        $stok = StockBarang::where('user_id', Auth::user()->id)
+        ->where(function ($query) use ($search) {
+            $query->where('nama_barang', 'LIKE', '%' . $search . '%')
+                  ->orWhere('kategori_barang', 'LIKE', '%' . $search . '%');
+        })
+            ->orderBy('created_at', 'DESC')
+            ->paginate(10);
+        return view('account.stock.index', compact('stok'));
     }
 }

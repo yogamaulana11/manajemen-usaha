@@ -1,7 +1,7 @@
 @extends('layouts.account')
 
 @section('title')
-     Uang Masuk - UANGKU
+     Stok Barang - {{ config('app.name') }}
 @stop
 
 @section('content')
@@ -19,7 +19,7 @@
                     </div>
 
                     <div class="card-body">
-                        <form action="{{ route('account.debit.search') }}" method="GET">
+                        <form action="{{ route('account.stock_barang.search') }}" method="GET">
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
