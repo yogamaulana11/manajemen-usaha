@@ -38,9 +38,11 @@ Route::prefix('account')->group(function () {
     //laporan debit
     Route::get('/laporan_debit', 'account\LaporanDebitController@index')->name('account.laporan_debit.index');
     Route::get('/laporan_debit/check', 'account\LaporanDebitController@check')->name('account.laporan_debit.check');
+    Route::get('/laporan_debit/export', 'account\LaporanDebitController@export')->name('account.laporan_debit.export');
     //laporan credit
     Route::get('/laporan_credit', 'account\LaporanCreditController@index')->name('account.laporan_credit.index');
     Route::get('/laporan_credit/check', 'account\LaporanCreditController@check')->name('account.laporan_credit.check');
+    Route::get('/laporan_credit/export', 'account\LaporanCreditController@export')->name('account.laporan_credit.export');
 
     // stock barang
     Route::get('/stock/search', 'account\StockBarangController@search')->name('account.stock_barang.search');
