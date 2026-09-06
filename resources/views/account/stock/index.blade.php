@@ -1,32 +1,32 @@
 @extends('layouts.account')
 
 @section('title')
-    Kategori Uang keluar - {{ config('app.name') }}
+     Stok Barang - {{ config('app.name') }}
 @stop
 
 @section('content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>KATEGORI UANG KELUAR</h1>
+                <h1>STOK BARANG</h1>
             </div>
 
             <div class="section-body">
 
                 <div class="card">
                     <div class="card-header">
-                        <h4><i class="fas fa-dice-d6"></i> KATEGORI UANG KELUAR</h4>
+                        <h4><i class="fas fa-money-check-alt"></i>DAFTAR STOK BARANG</h4>
                     </div>
 
                     <div class="card-body">
-                        <form action="{{ route('account.categories_credit.search') }}" method="GET">
+                        <form action="{{ route('account.stock_barang.search') }}" method="GET">
                             <div class="form-group">
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <a href="{{ route('account.categories_credit.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
+                                        <a href="{{ route('account.stock.create') }}" class="btn btn-primary" style="padding-top: 10px;"><i class="fa fa-plus-circle"></i> TAMBAH</a>
                                     </div>
                                     <input type="text" class="form-control" name="q"
-                                           placeholder="cari berdasarkan nama kategori">
+                                           placeholder="cari berdasarkan keterangan">
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> CARI
                                         </button>
@@ -39,7 +39,10 @@
                                 <thead>
                                 <tr>
                                     <th scope="col" style="text-align: center;width: 6%">NO.</th>
-                                    <th scope="col">NAMA KATEGORI</th>
+                                    <th scope="col">KATEGORI</th>
+                                    <th scope="col">NAMA BARANG</th>
+                                    <th scope="col">JUMLAH STOK</th>
+                                    <th scope="col">TANGGAL UPDATE</th>
                                     <th scope="col" style="width: 15%;text-align: center">AKSI</th>
                                 </tr>
                                 </thead>
@@ -47,12 +50,15 @@
                                 @php
                                     $no = 1;
                                 @endphp
-                                @foreach ($categories as $hasil)
+                                @foreach ($stok as $hasil)
                                     <tr>
                                         <th scope="row" style="text-align: center">{{ $no }}</th>
-                                        <td>{{ $hasil->name }}</td>
+                                        <td>{{ $hasil->kategori_barang }}</td>
+                                        <td>{{ $hasil->nama_barang }}</td>
+                                        <td>{{ $hasil->jumlah_stok }}</td>
+                                        <td>{{ $hasil->tanggal_update }}</td>
                                         <td class="text-center">
-                                            <a href="{{ route('account.categories_credit.edit', $hasil->id) }}" class="btn btn-sm btn-primary">
+                                            <a href="{{ route('account.stock.edit', $hasil->id) }}" class="btn btn-sm btn-primary">
                                                 <i class="fa fa-pencil-alt"></i>
                                             </a>
                                             <button onClick="Delete(this.id)" class="btn btn-sm btn-danger" id="{{ $hasil->id }}">
@@ -67,7 +73,7 @@
                                 </tbody>
                             </table>
                             <div style="text-align: center">
-                                {{$categories->links("vendor.pagination.bootstrap-4")}}
+                                {{$stok->links("vendor.pagination.bootstrap-4")}}
                             </div>
                         </div>
                     </div>
@@ -124,7 +130,7 @@
 
                     //ajax delete
                     jQuery.ajax({
-                        url: "{{ route("account.categories_credit.index") }}/"+id,
+                        url: "{{ route("account.stock.index") }}/"+id,
                         data: 	{
                             "id": id,
                             "_token": token

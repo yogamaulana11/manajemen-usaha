@@ -1,35 +1,36 @@
 @extends('layouts.account')
 
 @section('title')
-    Tambah Uang Keluar - {{ config('app.name') }}
+    Edit Stok Barang - {{ config('app.name') }}
 @stop
 
 @section('content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1> UANG KELUAR</h1>
+                <h1>STOK BARANG</h1>
             </div>
 
             <div class="section-body">
 
                 <div class="card">
                     <div class="card-header">
-                        <h4><i class="fas fa-money-check-alt"></i> TAMBAH UANG KELUAR</h4>
+                        <h4><i class="fas fa-money-check-alt"></i> EDIT STOK BARANG</h4>
                     </div>
 
                     <div class="card-body">
 
-                        <form action="{{ route('account.credit.store') }}" method="POST">
+                        <form action="{{ route('account.stock.update', $stok->id) }}" method="POST">
                             @csrf
+                            @method('PUT')
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>NOMINAL (Rp.)</label>
-                                        <input type="text" name="nominal" value="{{ old('nominal') }}" placeholder="Masukkan Nominal" class="form-control currency">
+                                        <label>NAMA BARANG</label>
+                                        <input type="text" name="nama_barang" value="{{ old('nama_barang', $stok->nama_barang) }}" placeholder="Masukkan Nama barang" class="form-control">
 
-                                        @error('nominal')
+                                        @error('nama_barang')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -38,10 +39,10 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>TANGGAL</label>
-                                        <input type="text" class="form-control datetimepicker" name="credit_date" placeholder="Pilih Tanggal">
+                                        <label>TANGGAL UPDATE</label>
+                                        <input type="text" class="form-control datetimepicker" name="tanggal_update" placeholder="Pilih Tanggal" value="{{ old('nama_barang', $stok->tanggal_update) }}">
 
-                                        @error('date_debit')
+                                        @error('tanggal_update')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -54,14 +55,9 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>KATEGORI</label>
-                                        <select class="form-control select2" name="category_id" style="width: 100%">
-                                            <option value="">-- PILIH KATEGORI --</option>
-                                            @foreach ($categories as $hasil)
-                                                <option value="{{ $hasil->id }}"> {{ $hasil->name }}</option>
-                                            @endforeach
-                                        </select>
+                                        <input type="text" name="kategori_barang" value="{{ old('kategori_barang', $stok->kategori_barang) }}" placeholder="Masukkan kategori" class="form-control">
 
-                                        @error('category_id')
+                                        @error('kategori_barang')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -73,10 +69,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>KETERANGAN</label>
-                                        <textarea class="form-control" name="description" rows="6" placeholder="Masukkan Keterangan">{{ old('description') }}</textarea>
+                                        <label>JUMLAH STOK</label>
+                                        <input type="text" name="jumlah_stok" value="{{ old('jumlah_stok', $stok->jumlah_stok) }}" placeholder="Masukkan Jumlah stok" class="form-control">
 
-                                        @error('description')
+                                        @error('jumlah_stok')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>

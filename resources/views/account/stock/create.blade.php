@@ -1,35 +1,35 @@
 @extends('layouts.account')
 
 @section('title')
-    Tambah Uang Masuk - {{ config('app.name') }}
+    Tambah Stok Barang - {{ config('app.name') }}
 @stop
 
 @section('content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1> UANG MASUK</h1>
+                <h1>STOK BARANG</h1>
             </div>
 
             <div class="section-body">
 
                 <div class="card">
                     <div class="card-header">
-                        <h4><i class="fas fa-money-check-alt"></i> TAMBAH UANG MASUK</h4>
+                        <h4><i class="fas fa-money-check-alt"></i> TAMBAH STOK BARANG</h4>
                     </div>
 
                     <div class="card-body">
 
-                        <form action="{{ route('account.debit.store') }}" method="POST">
+                        <form action="{{ route('account.stock.store') }}" method="POST">
                             @csrf
 
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>NOMINAL (Rp.)</label>
-                                        <input type="text" name="nominal" value="{{ old('nominal') }}" placeholder="Masukkan Nominal" class="form-control currency">
+                                        <label>NAMA BARANG</label>
+                                        <input type="text" name="nama_barang" value="{{ old('nama_barang') }}" placeholder="Masukkan Nama barang" class="form-control">
 
-                                        @error('nominal')
+                                        @error('nama_barang')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -38,10 +38,10 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>TANGGAL</label>
-                                        <input type="text" class="form-control datetimepicker" name="debit_date" placeholder="Pilih Tanggal">
+                                        <label>TANGGAL UPDATE</label>
+                                        <input type="text" class="form-control datetimepicker" name="tanggal_update" placeholder="Pilih Tanggal">
 
-                                        @error('date_debit')
+                                        @error('tanggal_update')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -54,14 +54,15 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>KATEGORI</label>
-                                        <select class="form-control select2" name="category_id" style="width: 100%">
+                                        <input type="text" name="kategori_barang" value="{{ old('kategori_barang') }}" placeholder="Masukkan kategori" class="form-control">
+                                        {{-- <select class="form-control select2" name="category_id" style="width: 100%">
                                             <option value="">-- PILIH KATEGORI --</option>
                                             @foreach ($categories as $hasil)
-                                                <option value="{{ $hasil->id }}" {{ old('category_id') == $hasil->id ? 'selected' : '' }}> {{ $hasil->name }}</option>
+                                                <option value="{{ $hasil->id }}"> {{ $hasil->name }}</option>
                                             @endforeach
-                                        </select>
+                                        </select> --}}
 
-                                        @error('category_id')
+                                        @error('kategori_barang')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -69,49 +70,14 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>BARANG (OPSIONAL)</label>
-                                        <select class="form-control select2" name="stock_id" id="stock_id" style="width: 100%">
-                                            <option value="">-- PILIH BARANG (OPSIONAL) --</option>
-                                            @foreach ($stocks as $stock)
-                                                <option value="{{ $stock->id }}" {{ old('stock_id') == $stock->id ? 'selected' : '' }}>
-                                                    {{ $stock->nama_barang }} (Sisa Stok: {{ $stock->jumlah_stok }})
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-                                        @error('stock_id')
-                                        <div class="invalid-feedback" style="display: block">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>JUMLAH BARANG (QTY)</label>
-                                        <input type="number" name="qty" id="qty" value="{{ old('qty') }}" min="1" placeholder="Masukkan Jumlah (Qty)" class="form-control">
-
-                                        @error('qty')
-                                        <div class="invalid-feedback" style="display: block">
-                                            {{ $message }}
-                                        </div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
 
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label>KETERANGAN</label>
-                                        <textarea class="form-control" name="description" rows="6" placeholder="Masukkan Keterangan">{{ old('description') }}</textarea>
+                                        <label>JUMLAH STOK</label>
+                                        <input type="text" name="jumlah_stok" value="{{ old('jumlah_stok') }}" placeholder="Masukkan Jumlah stok" class="form-control">
 
-                                        @error('description')
+                                        @error('jumlah_stok')
                                         <div class="invalid-feedback" style="display: block">
                                             {{ $message }}
                                         </div>
@@ -131,32 +97,6 @@
         </section>
     </div>
     <script>
-        /**
-         * Sweet alert
-         */
-        @if($message = Session::get('success'))
-        swal({
-            type: "success",
-            icon: "success",
-            title: "BERHASIL!",
-            text: "{{ $message }}",
-            timer: 1500,
-            showConfirmButton: false,
-            showCancelButton: false,
-            buttons: false,
-        });
-        @elseif($message = Session::get('error'))
-        swal({
-            type: "error",
-            icon: "error",
-            title: "GAGAL!",
-            text: "{{ $message }}",
-            timer: 2000,
-            showConfirmButton: false,
-            showCancelButton: false,
-            buttons: false,
-        });
-        @endif
 
         if($(".datetimepicker").length) {
             $('.datetimepicker').daterangepicker({
