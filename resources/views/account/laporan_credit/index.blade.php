@@ -25,7 +25,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>TANGGAL AWAL</label>
-                                        <input type="text" name="tanggal_awal" value="{{ old('tanggal_awal') }}" class="form-control datepicker">
+                                        <input type="text" name="tanggal_awal" value="{{ $tanggal_awal ?? old('tanggal_awal') }}" class="form-control datepicker">
                                     </div>
                                 </div>
                                 <div class="col-md-2" style="text-align: center">
@@ -34,7 +34,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>TANGGAL AKHIR</label>
-                                        <input type="text" name="tanggal_akhir" value="{{ old('tanggal_kahir') }}" class="form-control datepicker">
+                                        <input type="text" name="tanggal_akhir" value="{{ $tanggal_akhir ?? old('tanggal_akhir') }}" class="form-control datepicker">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
@@ -50,6 +50,11 @@
                     <div class="card">
                         <div class="card-header">
                             <h4><i class="fas fa-chart-area"></i> LAPORAN UANG KELUAR</h4>
+                            <div class="card-header-action">
+                                <a href="{{ route('account.laporan_credit.export', ['tanggal_awal' => $tanggal_awal, 'tanggal_akhir' => $tanggal_akhir]) }}" class="btn btn-success">
+                                    <i class="fa fa-file-excel"></i> EXPORT EXCEL
+                                </a>
+                            </div>
                         </div>
 
                         <div class="card-body">
