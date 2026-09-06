@@ -55,7 +55,13 @@
                                         <th scope="row" style="text-align: center">{{ $no }}</th>
                                         <td>{{ $hasil->name }}</td>
                                         <td>{{ rupiah($hasil->nominal) }}</td>
-                                        <td>{{ $hasil->description }}</td>
+                                        <td>
+                                            {{ $hasil->description }}
+                                            @if($hasil->nama_barang)
+                                                <br>
+                                                <span class="badge badge-info mt-1"><i class="fas fa-box"></i> {{ $hasil->nama_barang }} ({{ $hasil->qty }} pcs)</span>
+                                            @endif
+                                        </td>
                                         <td>{{ $hasil->debit_date }}</td>
                                         <td class="text-center">
                                             <a href="{{ route('account.debit.edit', $hasil->id) }}" class="btn btn-sm btn-primary">

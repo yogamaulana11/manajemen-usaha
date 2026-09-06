@@ -57,7 +57,7 @@
                                         <select class="form-control select2" name="category_id" style="width: 100%">
                                             <option value="">-- PILIH KATEGORI --</option>
                                             @foreach ($categories as $hasil)
-                                                <option value="{{ $hasil->id }}"> {{ $hasil->name }}</option>
+                                                <option value="{{ $hasil->id }}" {{ old('category_id') == $hasil->id ? 'selected' : '' }}> {{ $hasil->name }}</option>
                                             @endforeach
                                         </select>
 
@@ -69,6 +69,41 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>BARANG (OPSIONAL)</label>
+                                        <select class="form-control select2" name="stock_id" id="stock_id" style="width: 100%">
+                                            <option value="">-- PILIH BARANG (OPSIONAL) --</option>
+                                            @foreach ($stocks as $stock)
+                                                <option value="{{ $stock->id }}" {{ old('stock_id') == $stock->id ? 'selected' : '' }}>
+                                                    {{ $stock->nama_barang }} (Sisa Stok: {{ $stock->jumlah_stok }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+
+                                        @error('stock_id')
+                                        <div class="invalid-feedback" style="display: block">
+                                            {{ $message }}
+                                        </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>JUMLAH BARANG (QTY)</label>
+                                        <input type="number" name="qty" id="qty" value="{{ old('qty') }}" min="1" placeholder="Masukkan Jumlah (Qty)" class="form-control">
+
+                                        @error('qty')
+                                        <div class="invalid-feedback" style="display: block">
+                                            {{ $message }}
+                                        </div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
 
                             <div class="row">
                                 <div class="col-md-12">
