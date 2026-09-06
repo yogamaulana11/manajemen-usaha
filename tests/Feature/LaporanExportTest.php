@@ -107,4 +107,36 @@ class LaporanExportTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_tombol_export_excel_muncul_setelah_filter_laporan_debit()
+    {
+        $response = $this->actingAs($this->user)->get(route('account.laporan_debit.check', [
+            'tanggal_awal'  => '2026-03-01',
+            'tanggal_akhir' => '2026-03-31'
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('EXPORT EXCEL');
+        $expectedExportUrl = route('account.laporan_debit.export', [
+            'tanggal_awal'  => '2026-03-01',
+            'tanggal_akhir' => '2026-03-31'
+        ]);
+        $response->assertSee(e($expectedExportUrl));
+    }
+
+    public function test_tombol_export_excel_muncul_setelah_filter_laporan_credit()
+    {
+        $response = $this->actingAs($this->user)->get(route('account.laporan_credit.check', [
+            'tanggal_awal'  => '2026-03-01',
+            'tanggal_akhir' => '2026-03-31'
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('EXPORT EXCEL');
+        $expectedExportUrl = route('account.laporan_credit.export', [
+            'tanggal_awal'  => '2026-03-01',
+            'tanggal_akhir' => '2026-03-31'
+        ]);
+        $response->assertSee(e($expectedExportUrl));
+    }
 }
