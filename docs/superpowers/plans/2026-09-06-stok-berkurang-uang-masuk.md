@@ -25,7 +25,7 @@
 **Interfaces:**
 - Produces: `function setActive($path)` dan `function rupiah($angka)` aman dipanggil berkali-kali dalam testing/runtime tanpa fatal error `Cannot redeclare`.
 
-- [ ] **Step 1: Update `config/helpers.php` dengan `function_exists` guard**
+- [x] **Step 1: Update `config/helpers.php` dengan `function_exists` guard**
 
 ```php
 <?php
@@ -51,12 +51,12 @@ if (!function_exists('rupiah')) {
 }
 ```
 
-- [ ] **Step 2: Jalankan PHPUnit untuk memastikan tidak ada fatal error redeclaration**
+- [x] **Step 2: Jalankan PHPUnit untuk memastikan tidak ada fatal error redeclaration**
 
 Run: `./vendor/bin/phpunit --filter nothing`
 Expected: Output PHPUnit berjalan normal tanpa `Fatal error: Cannot redeclare setActive()`.
 
-- [ ] **Step 3: Commit perbaikan helper**
+- [x] **Step 3: Commit perbaikan helper**
 
 ```bash
 git add config/helpers.php
@@ -74,7 +74,7 @@ git commit -m "fix: tambahkan function_exists guard pada helpers untuk test isol
 - Consumes: Skema tabel `debit` dan `stock_barang` yang sudah ada.
 - Produces: Kolom `stock_id` (nullable foreign key) dan `qty` (nullable integer) pada tabel `debit`.
 
-- [ ] **Step 1: Buat file migrasi `2026_09_06_000000_add_stock_id_and_qty_to_debit_table.php`**
+- [x] **Step 1: Buat file migrasi `2026_09_06_000000_add_stock_id_and_qty_to_debit_table.php`**
 
 ```php
 <?php
@@ -118,12 +118,12 @@ class AddStockIdAndQtyToDebitTable extends Migration
 }
 ```
 
-- [ ] **Step 2: Jalankan migrasi database**
+- [x] **Step 2: Jalankan migrasi database**
 
 Run: `php artisan migrate`
 Expected: `Migrating: 2026_09_06_000000_add_stock_id_and_qty_to_debit_table` -> `Migrated`.
 
-- [ ] **Step 3: Commit migrasi**
+- [x] **Step 3: Commit migrasi**
 
 ```bash
 git add database/migrations/2026_09_06_000000_add_stock_id_and_qty_to_debit_table.php
@@ -142,7 +142,7 @@ git commit -m "feat: migrasi tambahkan stock_id dan qty pada tabel debit"
 - Consumes: Skema kolom baru `stock_id` dan `qty`.
 - Produces: `$fillable` fields dan relasi `stock()` di `Debit`, serta `debits()` di `StockBarang`.
 
-- [ ] **Step 1: Update `app/Debit.php`**
+- [x] **Step 1: Update `app/Debit.php`**
 
 Tambahkan `stock_id` dan `qty` ke `$fillable`, serta method `stock()`:
 
@@ -185,7 +185,7 @@ class Debit extends Model
 }
 ```
 
-- [ ] **Step 2: Update `app/StockBarang.php`**
+- [x] **Step 2: Update `app/StockBarang.php`**
 
 Tambahkan relasi `debits()`:
 
@@ -221,12 +221,12 @@ class StockBarang extends Model
 }
 ```
 
-- [ ] **Step 3: Verifikasi sintaks PHP**
+- [x] **Step 3: Verifikasi sintaks PHP**
 
 Run: `php -l app/Debit.php && php -l app/StockBarang.php`
 Expected: `No syntax errors detected`
 
-- [ ] **Step 4: Commit pembaruan model**
+- [x] **Step 4: Commit pembaruan model**
 
 ```bash
 git add app/Debit.php app/StockBarang.php
@@ -244,7 +244,7 @@ git commit -m "feat: tambahkan relasi dan fillable stock_id dan qty pada model D
 - Consumes: Request form `stock_id`, `qty`, `nominal`, `debit_date`, `category_id`, `description`.
 - Produces: CRUD `Debit` yang secara atomic memotong atau mengembalikan stok barang di tabel `stock_barang`.
 
-- [ ] **Step 1: Modifikasi `DebitController.php`**
+- [x] **Step 1: Modifikasi `DebitController.php`**
 
 Detail perubahan pada methods:
 1. `index()` dan `search()`:
@@ -280,12 +280,12 @@ Detail perubahan pada methods:
      - Jika ada `stock_id` dan `qty`: kembalikan stok `$stock->increment('jumlah_stok', $debit->qty)`.
      - Hapus debit.
 
-- [ ] **Step 2: Verifikasi sintaks PHP**
+- [x] **Step 2: Verifikasi sintaks PHP**
 
 Run: `php -l app/Http/Controllers/account/DebitController.php`
 Expected: `No syntax errors detected`
 
-- [ ] **Step 3: Commit controller**
+- [x] **Step 3: Commit controller**
 
 ```bash
 git add app/Http/Controllers/account/DebitController.php
@@ -305,7 +305,7 @@ git commit -m "feat: tambahkan logika pengurangan dan pengembalian stok pada Deb
 - Consumes: `$stocks` pada view create/edit, `$item->nama_barang` dan `$item->qty` pada view index.
 - Produces: Input dropdown barang & jumlah (qty) yang rapi dan konsisten dengan styling Stisla.
 
-- [ ] **Step 1: Update `resources/views/account/debit/create.blade.php`**
+- [x] **Step 1: Update `resources/views/account/debit/create.blade.php`**
 
 Tambahkan baris pilihan barang dan jumlah stok setelah kategori:
 ```html
@@ -342,16 +342,16 @@ Tambahkan baris pilihan barang dan jumlah stok setelah kategori:
 </div>
 ```
 
-- [ ] **Step 2: Update `resources/views/account/debit/edit.blade.php`**
+- [x] **Step 2: Update `resources/views/account/debit/edit.blade.php`**
 
 Tambahkan baris input `stock_id` dan `qty` dengan nilai existing dari `$debit->stock_id` dan `$debit->qty`.
 
-- [ ] **Step 3: Update `resources/views/account/debit/index.blade.php`**
+- [x] **Step 3: Update `resources/views/account/debit/index.blade.php`**
 
 Tambahkan kolom atau keterangan barang yang terjual: jika record debit memiliki `nama_barang`, tampilkan badge:
 `<span class="badge badge-info mt-1"><i class="fas fa-box"></i> {{ $hasil->nama_barang }} ({{ $hasil->qty }} pcs)</span>`
 
-- [ ] **Step 4: Commit perubahan views**
+- [x] **Step 4: Commit perubahan views**
 
 ```bash
 git add resources/views/account/debit/
@@ -369,7 +369,7 @@ git commit -m "feat: tambahkan input barang & qty pada view create, edit, dan ta
 - Consumes: HTTP endpoints `/account/debit`, `/account/debit/store`, `/account/debit/{id}`, `/account/stock`.
 - Produces: Test assertions otomatis yang memverifikasi pengurangan stok saat simpan, penolakan saat stok kurang, dan pengembalian stok saat hapus/edit.
 
-- [ ] **Step 1: Buat test suite `tests/Feature/DebitStockTest.php`**
+- [x] **Step 1: Buat test suite `tests/Feature/DebitStockTest.php`**
 
 ```php
 <?php
@@ -466,12 +466,12 @@ class DebitStockTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Jalankan automated test**
+- [x] **Step 2: Jalankan automated test**
 
 Run: `./vendor/bin/phpunit tests/Feature/DebitStockTest.php`
 Expected: 3 tests, assertions passed (green).
 
-- [ ] **Step 3: Commit test suite**
+- [x] **Step 3: Commit test suite**
 
 ```bash
 git add tests/Feature/DebitStockTest.php
