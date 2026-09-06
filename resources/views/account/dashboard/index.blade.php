@@ -84,8 +84,8 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            Highcharts.chart('container', {
+        $(function () {
+            $('#container').highcharts({
                 chart: {
                     type: 'column'
                 },
@@ -121,8 +121,7 @@
                 plotOptions: {
                     column: {
                         pointPadding: 0.2,
-                        borderWidth: 0,
-                        borderRadius: 4
+                        borderWidth: 0
                     }
                 },
                 series: [{
