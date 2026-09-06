@@ -26,7 +26,7 @@
 - Consumes: Request parameter `year` (opsional), data tabel `debit` dan `credit`.
 - Produces: Variabel `$selected_year`, `$year_list`, `$chart_debit`, dan `$chart_credit` yang dikirim ke view `account.dashboard.index`.
 
-- [ ] **Step 1: Modifikasi `app/Http/Controllers/account/DashboardController.php`**
+- [x] **Step 1: Modifikasi `app/Http/Controllers/account/DashboardController.php`**
 
 ```php
 <?php
@@ -157,12 +157,12 @@ class DashboardController extends Controller
 }
 ```
 
-- [ ] **Step 2: Verifikasi sintaks PHP**
+- [x] **Step 2: Verifikasi sintaks PHP**
 
 Run: `php -l app/Http/Controllers/account/DashboardController.php`
 Expected: `No syntax errors detected`
 
-- [ ] **Step 3: Commit controller**
+- [x] **Step 3: Commit controller**
 
 ```bash
 git add app/Http/Controllers/account/DashboardController.php
@@ -180,7 +180,7 @@ git commit -m "feat: tambahkan agregasi data bulanan dan filter tahun di Dashboa
 - Consumes: `$selected_year`, `$year_list`, `$chart_debit`, `$chart_credit`.
 - Produces: Tampilan visual grafik Column Chart Highcharts dan dropdown filter tahun.
 
-- [ ] **Step 1: Modifikasi `resources/views/account/dashboard/index.blade.php`**
+- [x] **Step 1: Modifikasi `resources/views/account/dashboard/index.blade.php`**
 
 Tambahkan dropdown tahun di card header dan inisialisasi Highcharts di script.
 
@@ -330,7 +330,7 @@ Tambahkan dropdown tahun di card header dan inisialisasi Highcharts di script.
 @stop
 ```
 
-- [ ] **Step 2: Commit perubahan view**
+- [x] **Step 2: Commit perubahan view**
 
 ```bash
 git add resources/views/account/dashboard/index.blade.php
@@ -348,7 +348,7 @@ git commit -m "feat: tambahkan dropdown filter tahun dan visualisasi Highcharts 
 - Consumes: Route `/account/dashboard`, tabel `debit` dan `credit`.
 - Produces: Test assertion otomatis yang memverifikasi HTTP 200, variabel view chart, dan filter tahun.
 
-- [ ] **Step 1: Buat file test `tests/Feature/DashboardChartTest.php`**
+- [x] **Step 1: Buat file test `tests/Feature/DashboardChartTest.php`**
 
 ```php
 <?php
@@ -419,12 +419,12 @@ class DashboardChartTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Jalankan test feature dashboard chart**
+- [x] **Step 2: Jalankan test feature dashboard chart**
 
 Run: `./vendor/bin/phpunit tests/Feature/DashboardChartTest.php`
 Expected: 1 test, assertions passed (green).
 
-- [ ] **Step 3: Commit test file**
+- [x] **Step 3: Commit test file**
 
 ```bash
 git add tests/Feature/DashboardChartTest.php
