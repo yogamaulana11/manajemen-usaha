@@ -143,8 +143,7 @@ class DebitController extends Controller
                         ->first();
 
                     if (!$stock || $stock->jumlah_stok < $qty) {
-                        $sisa = $stock ? $stock->jumlah_stok : 0;
-                        throw new \Exception("Stok barang tidak mencukupi! Sisa stok saat ini: {$sisa}");
+                        throw new \Exception("Jumlah stok tidak mencukupi!");
                     }
 
                     $stock->decrement('jumlah_stok', $qty);
@@ -242,8 +241,7 @@ class DebitController extends Controller
                         ->first();
 
                     if (!$newStock || $newStock->jumlah_stok < $newQty) {
-                        $sisa = $newStock ? $newStock->jumlah_stok : 0;
-                        throw new \Exception("Stok barang tidak mencukupi! Sisa stok saat ini: {$sisa}");
+                        throw new \Exception("Jumlah stok tidak mencukupi!");
                     }
 
                     $newStock->decrement('jumlah_stok', $newQty);
