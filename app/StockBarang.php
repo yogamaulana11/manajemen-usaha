@@ -21,4 +21,9 @@ class StockBarang extends Model
         'jumlah_stok',
         'tanggal_update'
     ];
+
+    public function debits()
+    {
+        return $this->hasMany(Debit::class, 'stock_id');
+    }
 }
