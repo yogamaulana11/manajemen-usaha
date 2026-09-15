@@ -101,6 +101,20 @@
                                 href="{{ route('account.stock.index') }}"><i class="fas fa-box"></i>
                                 <span>STOK BARANG</span></a>
                         </li>
+
+                        <li class="menu-header">MANAJEMEN PEMPEK</li>
+                        <li class="{{ setActive('account/master_pempek') }}"><a class="nav-link"
+                                href="{{ route('account.master_pempek.index') }}"><i class="fas fa-utensils"></i>
+                                <span>MASTER PEMPEK</span></a>
+                        </li>
+                        <li class="{{ setActive('account/produksi') }}"><a class="nav-link"
+                                href="{{ route('account.produksi.index') }}"><i class="fas fa-boxes"></i>
+                                <span>PRODUKSI (STOCK IN)</span></a>
+                        </li>
+                        <li class="{{ setActive('account/penjualan') }}"><a class="nav-link"
+                                href="{{ route('account.penjualan.index') }}"><i class="fas fa-cash-register"></i>
+                                <span>KASIR (STOCK OUT)</span></a>
+                        </li>
                         <li class="dropdown {{ setActive('account/categories_debit') . setActive('account/debit') }}">
                             <a href="#" class="nav-link has-dropdown"><i class="fas fa-wallet"></i><span>UANG
                                     MASUK</span></a>
