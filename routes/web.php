@@ -48,4 +48,8 @@ Route::prefix('account')->group(function () {
     Route::get('/stock/search', 'account\StockBarangController@search')->name('account.stock_barang.search');
     Route::Resource('/stock', 'account\StockBarangController',['as' => 'account']);
 
+    // master pempek
+    Route::get('/master_pempek/search', 'account\MasterPempekController@search')->name('account.master_pempek.search');
+    Route::Resource('/master_pempek', 'account\MasterPempekController', ['as' => 'account']);
+
 });
