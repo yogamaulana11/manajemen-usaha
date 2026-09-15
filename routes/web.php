@@ -52,4 +52,11 @@ Route::prefix('account')->group(function () {
     Route::get('/master_pempek/search', 'account\MasterPempekController@search')->name('account.master_pempek.search');
     Route::Resource('/master_pempek', 'account\MasterPempekController', ['as' => 'account']);
 
+    // produksi pempek (stock in)
+    Route::get('/produksi/search', 'account\ProduksiPempekController@search')->name('account.produksi.search');
+    Route::get('/produksi', 'account\ProduksiPempekController@index')->name('account.produksi.index');
+    Route::get('/produksi/create', 'account\ProduksiPempekController@create')->name('account.produksi.create');
+    Route::post('/produksi', 'account\ProduksiPempekController@store')->name('account.produksi.store');
+    Route::get('/produksi/{no_faktur}', 'account\ProduksiPempekController@show')->name('account.produksi.show');
+
 });
