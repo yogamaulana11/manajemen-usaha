@@ -59,4 +59,12 @@ Route::prefix('account')->group(function () {
     Route::post('/produksi', 'account\ProduksiPempekController@store')->name('account.produksi.store');
     Route::get('/produksi/{no_faktur}', 'account\ProduksiPempekController@show')->name('account.produksi.show');
 
+    // kasir penjualan (stock out)
+    Route::get('/penjualan/search', 'account\PenjualanKasirController@search')->name('account.penjualan.search');
+    Route::get('/penjualan', 'account\PenjualanKasirController@index')->name('account.penjualan.index');
+    Route::get('/penjualan/create', 'account\PenjualanKasirController@create')->name('account.penjualan.create');
+    Route::post('/penjualan', 'account\PenjualanKasirController@store')->name('account.penjualan.store');
+    Route::get('/penjualan/{no_faktur}', 'account\PenjualanKasirController@show')->name('account.penjualan.show');
+    Route::get('/penjualan/{no_faktur}/struk', 'account\PenjualanKasirController@struk')->name('account.penjualan.struk');
+
 });
