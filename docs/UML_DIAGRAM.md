@@ -1,15 +1,15 @@
-# Dokumentasi Diagram UML - Sistem Manajemen Usaha
+# Dokumentasi Diagram UML - Sistem Manajemen Usaha & Kasir Pempek
 
-Dokumen ini memuat diagram UML lengkap untuk proyek **Manajemen Usaha** yang dibuat menggunakan format Markdown Mermaid.
+Dokumen ini memuat diagram UML lengkap untuk proyek **Manajemen Usaha & Kasir Pempek** yang dibuat menggunakan format Markdown Mermaid, mencakup fitur inventaris pempek multi-item dan kasir POS sesuai revisi dosen.
 
 ---
 
 ## 1. Use Case Diagram
-Diagram ini memetakan peran pengguna (User / Pemilik Usaha) serta fitur-fitur yang tersedia di dalam aplikasi.
+Diagram ini memetakan peran pengguna (User / Pemilik Usaha / Kasir) serta fitur-fitur yang tersedia di dalam aplikasi.
 
 ```mermaid
 flowchart LR
-    User(["👤 User / Pemilik Usaha"])
+    User(["👤 User / Pemilik Usaha / Kasir"])
 
     subgraph Auth["🔐 Modul Autentikasi"]
         UC1["Login & Logout"]
@@ -18,25 +18,32 @@ flowchart LR
 
     subgraph DashboardMod["📊 Modul Dashboard"]
         UC3["Lihat Ringkasan Saldo & Transaksi"]
-        UC4["Lihat Grafik Statistik Keuangan 1 Tahun (Column Chart)"]
+        UC4["Lihat Grafik Statistik Keuangan 1 Tahun"]
         UC5["Filter Tahun Statistik"]
     end
 
-    subgraph MasterData["📦 Modul Master Data"]
-        UC6["Kelola Kategori Uang Masuk (CRUD)"]
-        UC7["Kelola Kategori Uang Keluar (CRUD)"]
-        UC8["Kelola Stok Barang (CRUD & Search)"]
+    subgraph PempekMod["🐟 Modul Manajemen Pempek"]
+        UC_P1["Kelola Master Pempek (CRUD, Foto & Harga)"]
+        UC_P2["Catat Produksi Pempek Multi-Item (Stock In)"]
+        UC_P3["Transaksi Kasir Penjualan POS Multi-Item (Stock Out)"]
+        UC_P4["Cetak Struk Nota Pembayaran Kasir"]
+        UC_P5["Auto Sinkronisasi Uang Masuk ke Debit"]
     end
 
-    subgraph Transaksi["💰 Modul Transaksi"]
-        UC9["Catat Uang Masuk (Debit)"]
-        UC10["Pilih Barang & Qty (Potong Stok Otomatis)"]
+    subgraph MasterData["📦 Modul Master Data Lama"]
+        UC6["Kelola Kategori Uang Masuk (CRUD)"]
+        UC7["Kelola Kategori Uang Keluar (CRUD)"]
+        UC8["Kelola Stok Barang Lama (CRUD & Search)"]
+    end
+
+    subgraph Transaksi["💰 Modul Transaksi Keuangan"]
+        UC9["Catat Uang Masuk Manual (Debit)"]
         UC11["Catat Uang Keluar (Credit)"]
     end
 
     subgraph Laporan["📑 Modul Laporan & Ekspor"]
-        UC12["Filter Laporan Uang Masuk berdasarkan Periode"]
-        UC13["Filter Laporan Uang Keluar berdasarkan Periode"]
+        UC12["Filter Laporan Uang Masuk"]
+        UC13["Filter Laporan Uang Keluar"]
         UC14["Export Laporan Uang Masuk ke Excel (.xlsx)"]
         UC15["Export Laporan Uang Keluar ke Excel (.xlsx)"]
     end
@@ -46,11 +53,17 @@ flowchart LR
     User --> UC3
     User --> UC4
     User --> UC5
+
+    User --> UC_P1
+    User --> UC_P2
+    User --> UC_P3
+    UC_P3 -.->|"<<extend>>"| UC_P4
+    UC_P3 -.->|"<<include>>"| UC_P5
+
     User --> UC6
     User --> UC7
     User --> UC8
     User --> UC9
-    UC9 -.->|"<<include>>"| UC10
     User --> UC11
     User --> UC12
     UC12 -.->|"<<extend>>"| UC14
@@ -60,208 +73,208 @@ flowchart LR
 
 ---
 
-## 2. Class Diagram (Arsitektur Model, Controller & Export)
-Diagram ini menggambarkan struktur kelas Domain Model Eloquent, Controller, dan Export Handler beserta atribut serta metodenya.
+## 2. Class Diagram
+Diagram struktur kelas (Model Eloquent, Controller, Export) beserta relasinya.
 
 ```mermaid
 classDiagram
-    direction TB
-
-    %% Model User
+    %% Eloquent Models
     class User {
         +int id
         +string full_name
         +string email
         +string username
         +string password
-        +string avatar
-        +datetime created_at
-        +datetime updated_at
-        +categories_debit() HasMany
-        +categories_credit() HasMany
         +debits() HasMany
         +credits() HasMany
-        +stock_barang() HasMany
+        +masterPempeks() HasMany
+        +produksiHeaders() HasMany
+        +penjualanHeaders() HasMany
     }
 
-    %% Model CategoriesDebit
-    class CategoriesDebit {
-        +int id
-        +int user_id
-        +string name
-        +datetime created_at
-        +datetime updated_at
+    class MasterPempek {
+        +string kode_pempek (PK)
+        +int user_id (FK)
+        +string nama_pempek
+        +string jenis_ikan
+        +decimal harga
+        +string foto
+        +int stok
         +user() BelongsTo
-        +debits() HasMany
+        +produksiDetails() HasMany
+        +penjualanDetails() HasMany
     }
 
-    %% Model CategoriesCredit
-    class CategoriesCredit {
-        +int id
-        +int user_id
-        +string name
-        +datetime created_at
-        +datetime updated_at
+    class ProduksiHeader {
+        +string no_faktur (PK)
+        +int user_id (FK)
+        +datetime tanggal
+        +string keterangan
         +user() BelongsTo
-        +credits() HasMany
+        +details() HasMany
     }
 
-    %% Model StockBarang
-    class StockBarang {
-        +int id
-        +int user_id
-        +string kategori_barang
-        +string nama_barang
-        +int jumlah_stok
-        +date tanggal_update
-        +datetime created_at
-        +datetime updated_at
+    class ProduksiDetail {
+        +int id_detail (PK)
+        +string no_faktur (FK)
+        +string kode_pempek (FK)
+        +int jumlah_produksi
+        +header() BelongsTo
+        +pempek() BelongsTo
+    }
+
+    class PenjualanHeader {
+        +string no_faktur (PK)
+        +int user_id (FK)
+        +datetime tanggal_jual
+        +decimal total_bayar
+        +decimal bayar
+        +decimal kembalian
+        +string catatan
         +user() BelongsTo
-        +debits() HasMany
+        +details() HasMany
     }
 
-    %% Model Debit
+    class PenjualanDetail {
+        +int id_detail (PK)
+        +string no_faktur (FK)
+        +string kode_pempek (FK)
+        +decimal harga
+        +int jumlah_jual
+        +decimal subtotal
+        +header() BelongsTo
+        +pempek() BelongsTo
+    }
+
     class Debit {
         +int id
-        +int category_id
-        +int user_id
-        +int stock_id
-        +int qty
+        +int user_id (FK)
+        +int category_id (FK)
         +bigint nominal
+        +text description
         +datetime debit_date
-        +text description
-        +datetime created_at
-        +datetime updated_at
-        +user() BelongsTo
-        +category() BelongsTo
-        +stock() BelongsTo
-    }
-
-    %% Model Credit
-    class Credit {
-        +int id
-        +int category_id
-        +int user_id
-        +bigint nominal
-        +datetime credit_date
-        +text description
-        +datetime created_at
-        +datetime updated_at
         +user() BelongsTo
         +category() BelongsTo
     }
 
     %% Controller Classes
-    class DebitController {
-        +index(Request) View
+    class MasterPempekController {
+        +index() View
         +create() View
         +store(Request) RedirectResponse
-        +edit(int id) View
-        +update(Request, int id) RedirectResponse
-        +destroy(int id) JsonResponse
+        +edit(string kode) View
+        +update(Request, string kode) RedirectResponse
+        +destroy(string kode) JsonResponse
+        +search(Request) View
     }
 
-    class LaporanDebitController {
+    class ProduksiPempekController {
         +index() View
-        +check(Request) View
-        +export(Request) BinaryFileResponse
+        +create() View
+        +store(Request) RedirectResponse
+        +show(string no_faktur) View
+        +search(Request) View
     }
 
-    class LaporanCreditController {
+    class PenjualanKasirController {
         +index() View
-        +check(Request) View
-        +export(Request) BinaryFileResponse
-    }
-
-    class DashboardController {
-        +index(Request) View
-    }
-
-    %% Export Classes
-    class DebitExport {
-        #string tanggal_awal
-        #string tanggal_akhir
-        +__construct(tanggal_awal, tanggal_akhir)
-        +view() View
-    }
-
-    class CreditExport {
-        #string tanggal_awal
-        #string tanggal_akhir
-        +__construct(tanggal_awal, tanggal_akhir)
-        +view() View
+        +create() View
+        +store(Request) JsonResponse
+        +show(string no_faktur) View
+        +struk(string no_faktur) View
+        +search(Request) View
     }
 
     %% Relationships
-    User "1" --> "0..*" CategoriesDebit : hasMany
-    User "1" --> "0..*" CategoriesCredit : hasMany
-    User "1" --> "0..*" StockBarang : hasMany
+    User "1" --> "0..*" MasterPempek : hasMany
+    User "1" --> "0..*" ProduksiHeader : hasMany
+    User "1" --> "0..*" PenjualanHeader : hasMany
     User "1" --> "0..*" Debit : hasMany
-    User "1" --> "0..*" Credit : hasMany
 
-    CategoriesDebit "1" --> "0..*" Debit : hasMany
-    StockBarang "1" --> "0..*" Debit : hasMany
-    CategoriesCredit "1" --> "0..*" Credit : hasMany
+    MasterPempek "1" --> "0..*" ProduksiDetail : hasMany
+    MasterPempek "1" --> "0..*" PenjualanDetail : hasMany
 
-    DebitController ..> Debit : manages
-    DebitController ..> StockBarang : updates stock
-    LaporanDebitController ..> DebitExport : creates
-    LaporanCreditController ..> CreditExport : creates
-    DebitExport ..> Debit : queries
-    CreditExport ..> Credit : queries
+    ProduksiHeader "1" --> "1..*" ProduksiDetail : hasMany
+    PenjualanHeader "1" --> "1..*" PenjualanDetail : hasMany
+
+    MasterPempekController ..> MasterPempek : manages
+    ProduksiPempekController ..> ProduksiHeader : manages
+    ProduksiPempekController ..> MasterPempek : increments stock
+    PenjualanKasirController ..> PenjualanHeader : manages
+    PenjualanKasirController ..> MasterPempek : decrements stock
+    PenjualanKasirController ..> Debit : creates income
 ```
 
 ---
 
 ## 3. Entity Relationship Diagram (ERD)
-Diagram relasi basis data fisik dari database MySQL aplikasi manajemen usaha.
+Diagram relasi basis data fisik dari database MySQL aplikasi manajemen usaha pempek.
 
 ```mermaid
 erDiagram
-    users ||--o{ categories_debit : "memiliki"
-    users ||--o{ categories_credit : "memiliki"
-    users ||--o{ stock_barang : "memiliki"
+    users ||--o{ master_pempek : "memiliki"
+    users ||--o{ produksi_header : "mencatat"
+    users ||--o{ penjualan_header : "melayani"
     users ||--o{ debit : "memiliki"
     users ||--o{ credit : "memiliki"
 
+    master_pempek ||--o{ produksi_detail : "diproduksi_pada"
+    produksi_header ||--|{ produksi_detail : "memuat"
+
+    master_pempek ||--o{ penjualan_detail : "dijual_pada"
+    penjualan_header ||--|{ penjualan_detail : "memuat"
+
     categories_debit ||--o{ debit : "mengelompokkan"
-    stock_barang ||--o{ debit : "berkurang_karena"
-    categories_credit ||--o{ credit : "mengelompokkan"
 
-    users {
-        bigint id PK
-        string full_name
-        string email UK
-        string username UK
-        string password
-        string avatar
+    master_pempek {
+        string kode_pempek PK
+        bigint user_id FK
+        string nama_pempek
+        string jenis_ikan
+        decimal harga
+        string foto
+        int stok
         datetime created_at
         datetime updated_at
     }
 
-    categories_debit {
-        bigint id PK
+    produksi_header {
+        string no_faktur PK
         bigint user_id FK
-        string name
+        datetime tanggal
+        text keterangan
         datetime created_at
         datetime updated_at
     }
 
-    categories_credit {
-        bigint id PK
-        bigint user_id FK
-        string name
+    produksi_detail {
+        bigint id_detail PK
+        string no_faktur FK
+        string kode_pempek FK
+        int jumlah_produksi
         datetime created_at
         datetime updated_at
     }
 
-    stock_barang {
-        bigint id PK
+    penjualan_header {
+        string no_faktur PK
         bigint user_id FK
-        string kategori_barang
-        string nama_barang
-        int jumlah_stok
-        date tanggal_update
+        datetime tanggal_jual
+        decimal total_bayar
+        decimal bayar
+        decimal kembalian
+        text catatan
+        datetime created_at
+        datetime updated_at
+    }
+
+    penjualan_detail {
+        bigint id_detail PK
+        string no_faktur FK
+        string kode_pempek FK
+        decimal harga
+        int jumlah_jual
+        decimal subtotal
         datetime created_at
         datetime updated_at
     }
@@ -270,176 +283,164 @@ erDiagram
         bigint id PK
         bigint user_id FK
         bigint category_id FK
-        bigint stock_id FK "nullable"
-        int qty "nullable"
         bigint nominal
         text description
         datetime debit_date
         datetime created_at
         datetime updated_at
     }
-
-    credit {
-        bigint id PK
-        bigint user_id FK
-        bigint category_id FK
-        bigint nominal
-        text description
-        datetime credit_date
-        datetime created_at
-        datetime updated_at
-    }
 ```
 
 ---
 
-## 4. Sequence Diagram: Transaksi Uang Masuk & Pemotongan Stok
-Diagram ini menunjukkan interaksi sistem saat pengguna mencatat transaksi uang masuk dengan pengurangan stok barang yang dilindungi transaksi database ACID.
+## 4. Sequence Diagram: Transaksi Kasir POS & Pemotongan Stok Atomik
+Diagram ini menunjukkan interaksi checkout kasir pempek dengan pengecekan stok server-side, mutasi stok atomik, pencatatan otomatis ke Uang Masuk (`debit`), dan cetak struk nota.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Pengguna as 👤 Pengguna
-    participant View as 🖥️ Form Uang Masuk (Blade/JS)
-    participant Ctrl as ⚙️ DebitController
+    actor Kasir as 👤 Kasir
+    participant View as 🖥️ Kasir POS (Blade/jQuery)
+    participant Ctrl as ⚙️ PenjualanKasirController
     participant DB as 🗄️ Database (MySQL)
 
-    Pengguna->>View: Pilih Kategori, Barang, Qty & Nominal
-    View->>View: Validasi input di sisi klien
-    Pengguna->>View: Klik Simpan
-    View->>Ctrl: POST /account/debit (nominal, stock_id, qty, debit_date, description)
+    Kasir->>View: Pilih varian pempek & kuantitas
+    View->>View: Hitung realtime total belanja
+    Kasir->>View: Masukkan uang pembayaran & Klik "Proses Transaksi"
+    View->>Ctrl: POST /account/penjualan (tanggal_jual, items[], bayar, catatan)
     
     activate Ctrl
-    Ctrl->>Ctrl: Validasi Request ($this->validate)
-    
+    Ctrl->>Ctrl: Validasi format request ($this->validate)
     Ctrl->>DB: DB::beginTransaction()
     
-    alt Jika Barang Dipilih (stock_id != null && qty > 0)
-        Ctrl->>DB: StockBarang::where('id', stock_id)->lockForUpdate()->first()
-        DB-->>Ctrl: Return $stock
+    loop Untuk setiap item belanja
+        Ctrl->>DB: MasterPempek::where('kode_pempek', kode)->lockForUpdate()->first()
+        DB-->>Ctrl: Return data item ($pempek)
         
-        alt Stok Tersedia ($stock->jumlah_stok >= qty)
-            Ctrl->>DB: $stock->decrement('jumlah_stok', qty)
-            Ctrl->>DB: $stock->update(['tanggal_update' => now()])
-            Ctrl->>DB: Debit::create([...])
-            Ctrl->>DB: DB::commit()
-            Ctrl-->>View: Redirect dengan pesan "Data Berhasil Disimpan!"
-            View-->>Pengguna: Tampilkan SweetAlert Berhasil ✅
-        else Stok Tidak Cukup ($stock->jumlah_stok < qty)
+        alt Stok Tidak Cukup (qty > $pempek->stok)
             Ctrl->>DB: DB::rollBack()
-            Ctrl-->>View: Redirect back dengan error "Jumlah stok tidak mencukupi!"
-            View-->>Pengguna: Tampilkan SweetAlert Gagal ❌
+            Ctrl-->>View: Return JSON Error 422 ("Stok tidak mencukupi!")
+            View-->>Kasir: Tampilkan SweetAlert Peringatan ❌
         end
-    else Transaksi Tanpa Barang
-        Ctrl->>DB: Debit::create([...])
-        Ctrl->>DB: DB::commit()
-        Ctrl-->>View: Redirect dengan pesan "Data Berhasil Disimpan!"
-        View-->>Pengguna: Tampilkan SweetAlert Berhasil ✅
     end
+
+    alt Uang Bayar Kurang (bayar < total_bayar)
+        Ctrl->>DB: DB::rollBack()
+        Ctrl-->>View: Return JSON Error 422 ("Uang pembayaran kurang!")
+        View-->>Kasir: Tampilkan SweetAlert Pembayaran Kurang ❌
+    end
+
+    %% Jika Semua Valid: Simpan Header & Detail
+    Ctrl->>DB: PenjualanHeader::create([no_faktur, total_bayar, bayar, kembalian, ...])
+    loop Untuk setiap item belanja
+        Ctrl->>DB: PenjualanDetail::create([no_faktur, kode_pempek, harga, jumlah_jual, subtotal])
+        Ctrl->>DB: $pempek->decrement('stok', jumlah_jual)
+    end
+
+    %% Integrasi Otomatis ke Keuangan
+    Ctrl->>DB: CategoriesDebit::firstOrCreate(['name' => 'Penjualan Pempek'])
+    Ctrl->>DB: Debit::create([nominal: total_bayar, description: 'Penjualan Kasir Faktur: INV-...'])
+
+    Ctrl->>DB: DB::commit()
+    Ctrl-->>View: Return JSON 200 (status: success, struk_url, no_faktur, kembalian)
     deactivate Ctrl
+
+    View-->>Kasir: Tampilkan Pop-up Berhasil & Tombol "Cetak Struk" ✅
+    Kasir->>View: Klik "Cetak Struk"
+    View->>Ctrl: GET /account/penjualan/{no_faktur}/struk
+    Ctrl-->>Kasir: Buka jendela cetak struk nota thermal (window.print()) 🖨️
 ```
 
 ---
 
-## 5. Sequence Diagram: Filter Laporan & Export ke Excel (.xlsx)
-Diagram interaksi saat pengguna memfilter laporan keuangan dan mengunduh berkas spreadsheet Excel.
+## 5. Sequence Diagram: Transaksi Produksi Multi-Item (Stock In)
+Diagram alur pencatatan produksi dapur dengan mekanisme *append row* dan penambahan stok.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Pengguna as 👤 Pengguna
-    participant View as 🖥️ Halaman Laporan (Blade)
-    participant Ctrl as ⚙️ LaporanDebitController
-    participant Export as 📄 DebitExport
-    participant ExcelLib as 📦 Maatwebsite Excel / PhpSpreadsheet
+    actor Dapur as 👤 Petugas Dapur
+    participant View as 🖥️ Form Produksi (Blade/jQuery)
+    participant Ctrl as ⚙️ ProduksiPempekController
     participant DB as 🗄️ Database (MySQL)
 
-    %% Fase 1: Filter
-    Pengguna->>View: Masukkan Tanggal Awal & Tanggal Akhir
-    Pengguna->>View: Klik tombol FILTER
-    View->>Ctrl: GET /account/laporan_debit/check?tanggal_awal=...&tanggal_akhir=...
-    activate Ctrl
-    Ctrl->>DB: Query Debit + Join Categories + Join Stock (Filter user_id & range tanggal)
-    DB-->>Ctrl: Return kumpulan data transaksi (paginated)
-    Ctrl-->>View: Render view index dengan data & tombol "EXPORT EXCEL"
-    deactivate Ctrl
-    View-->>Pengguna: Tampilkan tabel laporan dan tombol hijau "EXPORT EXCEL"
+    loop Tambah Varian Barang ke Faktur
+        Dapur->>View: Pilih varian pempek & ketik jumlah produksi
+        Dapur->>View: Tekan Enter / Tombol Tambah
+        View->>View: Append baris ke tabel detail tanpa reload halaman
+    end
 
-    %% Fase 2: Export
-    Pengguna->>View: Klik tombol "EXPORT EXCEL"
-    View->>Ctrl: GET /account/laporan_debit/export?tanggal_awal=...&tanggal_akhir=...
+    Dapur->>View: Klik tombol "SIMPAN FAKTUR PRODUKSI"
+    View->>Ctrl: POST /account/produksi (tanggal, keterangan, items[])
     activate Ctrl
-    Ctrl->>Export: new DebitExport(tanggal_awal, tanggal_akhir)
-    Ctrl->>ExcelLib: Excel::download(DebitExport, "laporan-uang-masuk-...xlsx")
-    activate ExcelLib
-    ExcelLib->>Export: panggil view()
-    activate Export
-    Export->>DB: Query semua transaksi periode aktif milik user
-    DB-->>Export: Return Collection transaksi debit
-    Export-->>ExcelLib: Render template Blade excel.blade.php
-    deactivate Export
-    ExcelLib->>ExcelLib: Konversi tabel HTML Blade ke berkas Spreadsheet (.xlsx)
-    ExcelLib-->>Ctrl: Binary File Stream (.xlsx)
-    deactivate ExcelLib
-    Ctrl-->>Pengguna: Download otomatis file "laporan-uang-masuk-[periode].xlsx" 📥
+    Ctrl->>Ctrl: Validasi Request ($this->validate)
+    Ctrl->>DB: DB::beginTransaction()
+
+    Ctrl->>DB: ProduksiHeader::create([no_faktur: PRD-..., tanggal, keterangan])
+    loop Untuk setiap baris item
+        Ctrl->>DB: MasterPempek::where('kode_pempek', kode)->lockForUpdate()->first()
+        Ctrl->>DB: ProduksiDetail::create([no_faktur, kode_pempek, jumlah_produksi])
+        Ctrl->>DB: $pempek->increment('stok', jumlah_produksi)
+    end
+
+    Ctrl->>DB: DB::commit()
+    Ctrl-->>View: Redirect ke index produksi dengan pesan sukses
     deactivate Ctrl
+    View-->>Dapur: Tampilkan SweetAlert Berhasil & stok terupdate ✅
 ```
 
 ---
 
 ## 6. Component Diagram (Arsitektur Sistem)
-Diagram ini memperlihatkan pemisahan lapisan arsitektur aplikasi (MVC Laravel, Presentation, Service/Export, dan Database).
 
 ```mermaid
 flowchart TD
     subgraph Client["💻 Client Layer (Browser)"]
         UI["Web Browser (Stisla UI / Bootstrap 4)"]
-        JS["Highcharts JS & SweetAlert"]
+        JS["Highcharts, Cleave.js & SweetAlert"]
+        Print["Thermal Print Dialog (window.print)"]
     end
 
     subgraph Presentation["🎨 Presentation Layer (Blade Views)"]
+        V_Pempek["account.master_pempek.*"]
+        V_Prod["account.produksi.*"]
+        V_Penj["account.penjualan.* (POS & Struk)"]
         V_Dash["account.dashboard.index"]
         V_Debit["account.debit.*"]
         V_Credit["account.credit.*"]
-        V_Stock["account.stock.*"]
-        V_LapDebit["account.laporan_debit.*"]
-        V_LapCredit["account.laporan_credit.*"]
-        V_Excel["excel.blade.php (Template Spreadsheet)"]
     end
 
     subgraph ControllerLayer["⚙️ Controller Layer"]
+        C_Pempek["MasterPempekController"]
+        C_Prod["ProduksiPempekController"]
+        C_Penj["PenjualanKasirController"]
         C_Dash["DashboardController"]
         C_Debit["DebitController"]
-        C_Credit["CreditController"]
-        C_Stock["StockBarangController"]
-        C_LapDebit["LaporanDebitController"]
-        C_LapCredit["LaporanCreditController"]
     end
 
-    subgraph BusinessLayer["🧠 Business & Export Services"]
-        E_Debit["DebitExport (Maatwebsite Excel)"]
-        E_Credit["CreditExport (Maatwebsite Excel)"]
-        Tx["DB Transaction Manager (Atomic Lock)"]
+    subgraph BusinessLayer["🧠 Business & Integrity Layer"]
+        Tx["DB Transaction Manager (lockForUpdate)"]
+        SyncDebit["Auto Cashflow Sync Service"]
     end
 
     subgraph ModelLayer["🏛️ Eloquent Model Layer"]
-        M_User["User"]
+        M_Pempek["MasterPempek"]
+        M_ProdHead["ProduksiHeader"]
+        M_ProdDet["ProduksiDetail"]
+        M_PenjHead["PenjualanHeader"]
+        M_PenjDet["PenjualanDetail"]
         M_Debit["Debit"]
-        M_Credit["Credit"]
-        M_CatDebit["CategoriesDebit"]
-        M_CatCredit["CategoriesCredit"]
-        M_Stock["StockBarang"]
     end
 
     subgraph DataLayer["🗄️ Persistence Layer"]
         DB[(MySQL Database)]
+        Storage[(Public Storage / Image Uploads)]
     end
 
     UI --> Presentation
     Presentation --> ControllerLayer
     ControllerLayer --> BusinessLayer
     BusinessLayer --> ModelLayer
-    ControllerLayer --> ModelLayer
     ModelLayer --> DataLayer
-    BusinessLayer --> V_Excel
+    C_Penj --> Print
 ```
