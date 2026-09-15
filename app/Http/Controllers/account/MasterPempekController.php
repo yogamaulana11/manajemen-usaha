@@ -4,6 +4,7 @@ namespace App\Http\Controllers\account;
 
 use App\Http\Controllers\Controller;
 use App\MasterPempek;
+use App\StockBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -68,7 +69,9 @@ class MasterPempekController extends Controller
             $autoCode = 'PMP-' . str_pad($count, 3, '0', STR_PAD_LEFT);
         }
 
-        return view('account.master_pempek.create', compact('autoCode'));
+        $stockBarang = StockBarang::where('user_id', Auth::user()->id)->get();
+
+        return view('account.master_pempek.create', compact('autoCode', 'stockBarang'));
     }
 
     /**
@@ -161,7 +164,6 @@ class MasterPempekController extends Controller
             'foto.image'           => 'File harus berupa gambar (jpeg, jpg, png)!',
             'foto.max'             => 'Ukuran foto maksimal 2MB!',
         ]);
-
         $cleanHarga = str_replace([',', '.'], '', $request->input('harga'));
 
         $fotoPath = $pempek->foto;

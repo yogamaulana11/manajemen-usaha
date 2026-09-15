@@ -25,16 +25,16 @@ Route::prefix('account')->group(function () {
 
     //categories debit
     Route::get('/categories_debit/search', 'account\CategoriesDebitController@search')->name('account.categories_debit.search');
-    Route::Resource('/categories_debit', 'account\CategoriesDebitController',['as' => 'account']);
+    Route::Resource('/categories_debit', 'account\CategoriesDebitController', ['as' => 'account']);
     //debit
     Route::get('/debit/search', 'account\DebitController@search')->name('account.debit.search');
-    Route::Resource('/debit', 'account\DebitController',['as' => 'account']);
+    Route::Resource('/debit', 'account\DebitController', ['as' => 'account']);
     //categories credit
     Route::get('/categories_credit/search', 'account\CategoriesCreditController@search')->name('account.categories_credit.search');
-    Route::Resource('/categories_credit', 'account\CategoriesCreditController',['as' => 'account']);
+    Route::Resource('/categories_credit', 'account\CategoriesCreditController', ['as' => 'account']);
     //credit
     Route::get('/credit/search', 'account\CreditController@search')->name('account.credit.search');
-    Route::Resource('/credit', 'account\CreditController',['as' => 'account']);
+    Route::Resource('/credit', 'account\CreditController', ['as' => 'account']);
     //laporan debit
     Route::get('/laporan_debit', 'account\LaporanDebitController@index')->name('account.laporan_debit.index');
     Route::get('/laporan_debit/check', 'account\LaporanDebitController@check')->name('account.laporan_debit.check');
@@ -46,7 +46,7 @@ Route::prefix('account')->group(function () {
 
     // stock barang
     Route::get('/stock/search', 'account\StockBarangController@search')->name('account.stock_barang.search');
-    Route::Resource('/stock', 'account\StockBarangController',['as' => 'account']);
+    Route::Resource('/stock', 'account\StockBarangController', ['as' => 'account']);
 
     // master pempek
     Route::get('/master_pempek/search', 'account\MasterPempekController@search')->name('account.master_pempek.search');
@@ -59,6 +59,8 @@ Route::prefix('account')->group(function () {
     Route::post('/produksi', 'account\ProduksiPempekController@store')->name('account.produksi.store');
     Route::get('/produksi/{no_faktur}', 'account\ProduksiPempekController@show')->name('account.produksi.show');
 
+    Route::get('/riwayat', 'account\PenjualanKasirController@index')->name('account.riwayat.index');
+
     // kasir penjualan (stock out)
     Route::get('/penjualan/search', 'account\PenjualanKasirController@search')->name('account.penjualan.search');
     Route::get('/penjualan', 'account\PenjualanKasirController@index')->name('account.penjualan.index');
@@ -66,5 +68,4 @@ Route::prefix('account')->group(function () {
     Route::post('/penjualan', 'account\PenjualanKasirController@store')->name('account.penjualan.store');
     Route::get('/penjualan/{no_faktur}', 'account\PenjualanKasirController@show')->name('account.penjualan.show');
     Route::get('/penjualan/{no_faktur}/struk', 'account\PenjualanKasirController@struk')->name('account.penjualan.struk');
-
 });

@@ -97,37 +97,36 @@
                                 href="{{ route('account.dashboard.index') }}"><i class="fas fa-home"></i>
                                 <span>DASHBOARD</span></a>
                         </li>
-                        <li class="{{ setActive('account/stock') }}"><a class="nav-link"
+                        <!-- <li class="{{ setActive('account/stock') }}"><a class="nav-link"
                                 href="{{ route('account.stock.index') }}"><i class="fas fa-box"></i>
                                 <span>STOK BARANG</span></a>
-                        </li>
+                        </li> -->
 
                         <li class="menu-header">MANAJEMEN PEMPEK</li>
                         <li class="{{ setActive('account/master_pempek') }}"><a class="nav-link"
                                 href="{{ route('account.master_pempek.index') }}"><i class="fas fa-utensils"></i>
-                                <span>MASTER PEMPEK</span></a>
+                                <span>STOK BARANG</span></a>
                         </li>
                         <li class="{{ setActive('account/produksi') }}"><a class="nav-link"
                                 href="{{ route('account.produksi.index') }}"><i class="fas fa-boxes"></i>
                                 <span>PRODUKSI (STOCK IN)</span></a>
                         </li>
-                        <li class="{{ setActive('account/penjualan') }}"><a class="nav-link"
-                                href="{{ route('account.penjualan.index') }}"><i class="fas fa-cash-register"></i>
+                        <li class="{{ setActive('account/penjualan/create') }}"><a class="nav-link"
+                                href="{{ route('account.penjualan.create') }}"><i class="fa fa-shopping-cart"></i>
                                 <span>KASIR (STOCK OUT)</span></a>
                         </li>
-                        <li class="dropdown {{ setActive('account/categories_debit') . setActive('account/debit') }}">
-                            <a href="#" class="nav-link has-dropdown"><i class="fas fa-wallet"></i><span>UANG
-                                    MASUK</span></a>
+                        <li class="dropdown {{ setActive('account/riwayat') . setActive('account/riwayat') }}">
+                            <a href="#" class="nav-link has-dropdown"><i class="fas fa-wallet"></i><span>RIWAYAT TRANSAKSI</span></a>
                             <ul class="dropdown-menu">
-                                <li class="{{ setActive('account/categories_debit') }}"><a class="nav-link"
+                                <!-- <li class="{{ setActive('account/categories_debit') }}"><a class="nav-link"
                                         href="{{ route('account.categories_debit.index') }}"><i
-                                            class="fas fa-dice-d6"></i> KATEGORI</a></li>
-                                <li class="{{ setActive('account/debit') }}"><a class="nav-link"
-                                        href="{{ route('account.debit.index') }}"><i
-                                            class="fas fa-money-check-alt"></i> UANG MASUK</a></li>
+                                            class="fas fa-dice-d6"></i> KATEGORI</a></li> -->
+                                <li class="{{ setActive('account/riwayat') }}"><a class="nav-link"
+                                        href="{{ route('account.riwayat.index') }}"><i
+                                            class="fas fa-money-check-alt"></i>RIWAYAT</a></li>
                             </ul>
                         </li>
-                        <li
+                        <!-- <li
                             class="dropdown {{ setActive('account/categories_credit') . setActive('account/credit') }}">
                             <a href="#" class="nav-link has-dropdown"><i class="fas fa-wallet"></i><span>UANG
                                     KELUAR</span></a>
@@ -139,7 +138,7 @@
                                         href="{{ route('account.credit.index') }}"><i
                                             class="fas fa-money-check-alt"></i> UANG KELUAR</a></li>
                             </ul>
-                        </li>
+                        </li> -->
 
                         <li
                             class="dropdown {{ setActive('account/laporan_debit') . setActive('account/laporan_credit') }}">
@@ -148,10 +147,10 @@
                             <ul class="dropdown-menu">
                                 <li class="{{ setActive('account/laporan_debit') }}"><a class="nav-link"
                                         href="{{ route('account.laporan_debit.index') }}"><i
-                                            class="fas fa-chart-line"></i> UANG MASUK</a></li>
-                                <li class="{{ setActive('account/laporan_credit') }}"><a class="nav-link"
+                                            class="fas fa-chart-line"></i> PENDAPATAN</a></li>
+                                <!-- <li class="{{ setActive('account/laporan_credit') }}"><a class="nav-link"
                                         href="{{ route('account.laporan_credit.index') }}"><i
-                                            class="fas fa-chart-area"></i> UANG KELUAR</a></li>
+                                            class="fas fa-chart-area"></i> UANG KELUAR</a></li> -->
                                 {{-- <li><a class="nav-link" href="index-0.html"><i class="fas fa-chart-pie"></i> SEMUA</a></li> --}}
                             </ul>
                         </li>

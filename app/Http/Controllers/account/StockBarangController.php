@@ -30,7 +30,6 @@ class StockBarangController extends Controller
             ->orderBy('stock_barang.created_at', 'DESC')
             ->paginate(10);
 
-        // dd($stok);
         return view('account.stock.index', compact('stok'));
     }
 
@@ -175,10 +174,10 @@ class StockBarangController extends Controller
     {
         $search = $request->get('q');
         $stok = StockBarang::where('user_id', Auth::user()->id)
-        ->where(function ($query) use ($search) {
-            $query->where('nama_barang', 'LIKE', '%' . $search . '%')
-                  ->orWhere('kategori_barang', 'LIKE', '%' . $search . '%');
-        })
+            ->where(function ($query) use ($search) {
+                $query->where('nama_barang', 'LIKE', '%' . $search . '%')
+                    ->orWhere('kategori_barang', 'LIKE', '%' . $search . '%');
+            })
             ->orderBy('created_at', 'DESC')
             ->paginate(10);
         return view('account.stock.index', compact('stok'));

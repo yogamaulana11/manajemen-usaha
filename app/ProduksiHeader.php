@@ -36,10 +36,15 @@ class ProduksiHeader extends Model
         'keterangan',
     ];
 
-    /**
-     * @var array
-     */
-    protected $dates = ['tanggal'];
+    public function getTanggalAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value);
+    }
+
+    public function setTanggalAttribute($value)
+    {
+        $this->attributes['tanggal'] = \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s');
+    }
 
     public function user()
     {

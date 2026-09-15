@@ -39,10 +39,15 @@ class PenjualanHeader extends Model
         'catatan',
     ];
 
-    /**
-     * @var array
-     */
-    protected $dates = ['tanggal_jual'];
+    public function getTanggalJualAttribute($value)
+    {
+        return \Carbon\Carbon::parse($value);
+    }
+
+    public function setTanggalJualAttribute($value)
+    {
+        $this->attributes['tanggal_jual'] = \Carbon\Carbon::parse($value)->format('Y-m-d H:i:s');
+    }
 
     public function user()
     {

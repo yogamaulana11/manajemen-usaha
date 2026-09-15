@@ -46,7 +46,7 @@ class ProduksiPempekController extends Controller
     public function search(Request $request)
     {
         $search = $request->get('q');
-        $produksi = ProduksiHeader::with(['details.pempek'])
+        $produksi = MasterPempek::with(['details.pempek'])
             ->where('user_id', Auth::user()->id)
             ->where(function ($query) use ($search) {
                 $query->where('no_faktur', 'LIKE', '%' . $search . '%')
@@ -69,7 +69,6 @@ class ProduksiPempekController extends Controller
         $pempekList = MasterPempek::where('user_id', Auth::user()->id)
             ->orderBy('nama_pempek', 'ASC')
             ->get();
-
         $today = Carbon::now()->format('Ymd');
         $prefix = 'PRD-' . $today . '-';
         $count = ProduksiHeader::where('user_id', Auth::user()->id)
@@ -80,6 +79,9 @@ class ProduksiPempekController extends Controller
             $count++;
             $autoNoFaktur = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
         }
+
+        // update data
+        // $result = StockBarang::where
 
         return view('account.produksi.create', compact('pempekList', 'autoNoFaktur'));
     }
@@ -108,6 +110,8 @@ class ProduksiPempekController extends Controller
 
         $today = Carbon::now()->format('Ymd');
         $prefix = 'PRD-' . $today . '-';
+
+
 
         DB::beginTransaction();
         try {
@@ -143,9 +147,11 @@ class ProduksiPempekController extends Controller
                     'jumlah_produksi' => (int) $item['jumlah_produksi'],
                 ]);
 
-                // Mutasi stok bertambah (+)
+                // Update stock master_pempek (bertambah)
                 $pempek->increment('stok', (int) $item['jumlah_produksi']);
             }
+
+
 
             DB::commit();
 

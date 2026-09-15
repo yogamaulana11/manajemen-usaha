@@ -113,140 +113,140 @@ class PenjualanKasirController extends Controller
         $cleanBayar = (float) str_replace([',', '.'], '', $request->input('bayar'));
 
         DB::beginTransaction();
-        try {
-            $today = Carbon::now()->format('Ymd');
-            $prefix = 'INV-' . $today . '-';
-            $count = PenjualanHeader::where('user_id', Auth::user()->id)
-                ->where('no_faktur', 'LIKE', $prefix . '%')
-                ->count() + 1;
+        // try {
+        $today = Carbon::now()->format('Ymd');
+        $prefix = 'INV-' . $today . '-';
+        $count = PenjualanHeader::where('user_id', Auth::user()->id)
+            ->where('no_faktur', 'LIKE', $prefix . '%')
+            ->count() + 1;
+        $noFaktur = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
+        while (PenjualanHeader::where('no_faktur', $noFaktur)->exists()) {
+            $count++;
             $noFaktur = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
-            while (PenjualanHeader::where('no_faktur', $noFaktur)->exists()) {
-                $count++;
-                $noFaktur = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
-            }
+        }
 
-            $calculatedTotal = 0;
-            $itemsToProcess = [];
+        $calculatedTotal = 0;
+        $itemsToProcess = [];
 
-            // Validasi stok & kalkulasi harga langsung dari server-side
-            foreach ($request->input('items') as $item) {
-                $pempek = MasterPempek::where('kode_pempek', $item['kode_pempek'])
-                    ->where('user_id', Auth::user()->id)
-                    ->lockForUpdate()
-                    ->first();
+        // Validasi stok & kalkulasi harga langsung dari server-side
+        foreach ($request->input('items') as $item) {
+            $pempek = MasterPempek::where('kode_pempek', $item['kode_pempek'])
+                ->where('user_id', Auth::user()->id)
+                ->lockForUpdate()
+                ->first();
 
-                if (!$pempek) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => "Produk pempek [{$item['kode_pempek']}] tidak ditemukan!"
-                    ], 422);
-                }
-
-                $qty = (int) $item['jumlah_jual'];
-
-                // Validasi Stok Tersedia
-                if ($qty > $pempek->stok) {
-                    DB::rollBack();
-                    return response()->json([
-                        'status'  => 'error',
-                        'message' => "Stok untuk {$pempek->nama_pempek} ({$pempek->kode_pempek}) tidak mencukupi! Sisa stok saat ini: {$pempek->stok} pcs, kuantitas beli: {$qty} pcs."
-                    ], 422);
-                }
-
-                $harga = (float) $pempek->harga;
-                $subtotal = $harga * $qty;
-                $calculatedTotal += $subtotal;
-
-                $itemsToProcess[] = [
-                    'pempek'      => $pempek,
-                    'kode_pempek' => $pempek->kode_pempek,
-                    'harga'       => $harga,
-                    'jumlah_jual' => $qty,
-                    'subtotal'    => $subtotal,
-                ];
-            }
-
-            // Validasi nominal bayar
-            if ($cleanBayar < $calculatedTotal) {
+            if (!$pempek) {
                 DB::rollBack();
-                $kekurangan = $calculatedTotal - $cleanBayar;
                 return response()->json([
                     'status'  => 'error',
-                    'message' => "Uang pembayaran kurang Rp. " . number_format($kekurangan, 0, ',', '.') . "! Total tagihan: Rp. " . number_format($calculatedTotal, 0, ',', '.') . ", uang diterima: Rp. " . number_format($cleanBayar, 0, ',', '.') . "."
+                    'message' => "Produk pempek [{$item['kode_pempek']}] tidak ditemukan!"
                 ], 422);
             }
 
-            $kembalian = $cleanBayar - $calculatedTotal;
+            $qty = (int) $item['jumlah_jual'];
 
-            // Simpan Header Penjualan
-            $header = PenjualanHeader::create([
-                'no_faktur'    => $noFaktur,
-                'user_id'      => Auth::user()->id,
-                'tanggal_jual' => $request->input('tanggal_jual'),
-                'total_bayar'  => $calculatedTotal,
-                'bayar'        => $cleanBayar,
-                'kembalian'    => $kembalian,
-                'catatan'      => $request->input('catatan'),
-            ]);
-
-            // Simpan Detail & Potong Stok
-            foreach ($itemsToProcess as $processed) {
-                PenjualanDetail::create([
-                    'no_faktur'   => $header->no_faktur,
-                    'kode_pempek' => $processed['kode_pempek'],
-                    'harga'       => $processed['harga'],
-                    'jumlah_jual' => $processed['jumlah_jual'],
-                    'subtotal'    => $processed['subtotal'],
-                ]);
-
-                // Mutasi stok berkurang (-)
-                $processed['pempek']->decrement('stok', $processed['jumlah_jual']);
-            }
-
-            // Integrasi ke Uang Masuk (Debit)
-            $category = CategoriesDebit::firstOrCreate(
-                ['user_id' => Auth::user()->id, 'name' => 'Penjualan Pempek']
-            );
-
-            Debit::create([
-                'user_id'     => Auth::user()->id,
-                'category_id' => $category->id,
-                'nominal'     => $calculatedTotal,
-                'debit_date'  => $request->input('tanggal_jual'),
-                'description' => 'Penjualan Kasir Faktur: ' . $header->no_faktur,
-            ]);
-
-            DB::commit();
-
-            if ($request->ajax() || $request->wantsJson()) {
-                return response()->json([
-                    'status'      => 'success',
-                    'message'     => "Transaksi {$noFaktur} Berhasil Diproses!",
-                    'no_faktur'   => $header->no_faktur,
-                    'total_bayar' => $calculatedTotal,
-                    'bayar'       => $cleanBayar,
-                    'kembalian'   => $kembalian,
-                    'struk_url'   => route('account.penjualan.struk', $header->no_faktur),
-                ]);
-            }
-
-            return redirect()->route('account.penjualan.index')
-                ->with('success', "Transaksi {$noFaktur} Berhasil Disimpan!");
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            if ($request->ajax() || $request->wantsJson()) {
+            // Validasi Stok Tersedia
+            if ($qty > $pempek->stok) {
+                DB::rollBack();
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-                ], 500);
+                    'message' => "Stok untuk {$pempek->nama_pempek} ({$pempek->kode_pempek}) tidak mencukupi! Sisa stok saat ini: {$pempek->stok} pcs, kuantitas beli: {$qty} pcs."
+                ], 422);
             }
 
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Gagal memproses transaksi kasir: ' . $e->getMessage());
+            $harga = (float) $pempek->harga;
+            $subtotal = $harga * $qty;
+            $calculatedTotal += $subtotal;
+
+            $itemsToProcess[] = [
+                'pempek'      => $pempek,
+                'kode_pempek' => $pempek->kode_pempek,
+                'harga'       => $harga,
+                'jumlah_jual' => $qty,
+                'subtotal'    => $subtotal,
+            ];
         }
+
+        // Validasi nominal bayar
+        if ($cleanBayar < $calculatedTotal) {
+            DB::rollBack();
+            $kekurangan = $calculatedTotal - $cleanBayar;
+            return response()->json([
+                'status'  => 'error',
+                'message' => "Uang pembayaran kurang Rp. " . number_format($kekurangan, 0, ',', '.') . "! Total tagihan: Rp. " . number_format($calculatedTotal, 0, ',', '.') . ", uang diterima: Rp. " . number_format($cleanBayar, 0, ',', '.') . "."
+            ], 422);
+        }
+
+        $kembalian = $cleanBayar - $calculatedTotal;
+
+        // Simpan Header Penjualan
+        $header = PenjualanHeader::create([
+            'no_faktur'    => $noFaktur,
+            'user_id'      => Auth::user()->id,
+            'tanggal_jual' => $request->input('tanggal_jual'),
+            'total_bayar'  => $calculatedTotal,
+            'bayar'        => $cleanBayar,
+            'kembalian'    => $kembalian,
+            'catatan'      => $request->input('catatan'),
+        ]);
+
+        // Simpan Detail & Potong Stok
+        foreach ($itemsToProcess as $processed) {
+            PenjualanDetail::create([
+                'no_faktur'   => $header->no_faktur,
+                'kode_pempek' => $processed['kode_pempek'],
+                'harga'       => $processed['harga'],
+                'jumlah_jual' => $processed['jumlah_jual'],
+                'subtotal'    => $processed['subtotal'],
+            ]);
+
+            // Mutasi stok berkurang (-)
+            $processed['pempek']->decrement('stok', $processed['jumlah_jual']);
+        }
+
+        // Integrasi ke Uang Masuk (Debit)
+        $category = CategoriesDebit::firstOrCreate(
+            ['user_id' => Auth::user()->id, 'name' => 'Penjualan Pempek']
+        );
+
+        Debit::create([
+            'user_id'     => Auth::user()->id,
+            'category_id' => $category->id,
+            'nominal'     => $calculatedTotal,
+            'debit_date'  => $request->input('tanggal_jual'),
+            'description' => 'Penjualan Kasir Faktur: ' . $header->no_faktur,
+        ]);
+
+        DB::commit();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status'      => 'success',
+                'message'     => "Transaksi {$noFaktur} Berhasil Diproses!",
+                'no_faktur'   => $header->no_faktur,
+                'total_bayar' => $calculatedTotal,
+                'bayar'       => $cleanBayar,
+                'kembalian'   => $kembalian,
+                'struk_url'   => route('account.penjualan.struk', $header->no_faktur),
+            ]);
+        }
+
+        return redirect()->route('account.penjualan.index')
+            ->with('success', "Transaksi {$noFaktur} Berhasil Disimpan!");
+        // } catch (\Exception $e) {
+        // DB::rollBack();
+
+        // if ($request->ajax() || $request->wantsJson()) {
+        // return response()->json([
+        // 'status'  => 'error',
+        // 'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+        // ], 500);
+        // }
+
+        // return redirect()->back()
+        // ->withInput()
+        // ->with('error', 'Gagal memproses transaksi kasir: ' . $e->getMessage());
+        // }
     }
 
     /**

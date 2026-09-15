@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockBarang extends Model
 {
-      /**
+    /**
      * @var string
      */
     protected $table = 'stock_barang';
@@ -15,6 +15,7 @@ class StockBarang extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'user_id',
         'kategori_barang',
         'nama_barang',
